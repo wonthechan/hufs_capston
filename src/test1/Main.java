@@ -1,5 +1,7 @@
 package test1;
 
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -13,6 +15,11 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+import javax.script.Bindings;
+import javax.script.Invocable;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.SimpleBindings;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -27,16 +34,26 @@ public class Main {
 	static String userAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.110 Whale/1.4.64.6 Safari/537.36";
 	
 	public static void main(String[] args) throws IOException, Exception {
+		// 자바스크립트 function 호출을 위해 Nashorn JavaScript 엔진 사용
+		ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
+		engine.eval(new FileReader("./src/sha512.js"));
 		
-		// Set header values
-		Map<String, String> defaultHeader = new HashMap<String, String>();
-		defaultHeader.put("Referer", "");
+		// cast the script engine to an invocable instance
+		Invocable invocable = (Invocable) engine;
+		//Object result = invocable.invokeFunction("SHA512", "sdfdfsf");
 		
 		// parameter 값으로 form data 전송
 		String sID = "201402783";
+		String rawPW = "";
 		String sha512PW = "8b8b6aa4bf808f01017bc1fb50960a18b3861f6ae269b138de8ff975c15b4ab607a2c3847301bb74d1b6ac106d15edbb9d7baf57826bbecbb0b5cc9d9c5948c3";
+		// 패스워드 해쉬값 리턴
+		//String sha512PW = invocable.invokeFunction("SHA512", rawPW).toString();
+		//System.out.println(sha512PW);
+		
+		//String sha512PW = "8b8b6aa4bf808f01017bc1fb50960a18b3861f6ae269b138de8ff975c15b4ab607a2c3847301bb74d1b6ac106d15edbb9d7baf57826bbecbb0b5cc9d9c5948c3";
 		String loginURL = "https://eclass2.hufs.ac.kr:4443/ilos/lo/login.acl?usr_id=" + sID +
 							"&usr_pwd=" + sha512PW;
+		
 		// 로그인(POST) - HTTPS
     	Connection.Response response1 = Jsoup.connect(loginURL)
 				.userAgent(userAgent)
