@@ -45,10 +45,10 @@ public class Main {
 		// parameter 값으로 form data 전송
 		String sID = "201402783";
 		String rawPW = "";
-		String sha512PW = "8b8b6aa4bf808f01017bc1fb50960a18b3861f6ae269b138de8ff975c15b4ab607a2c3847301bb74d1b6ac106d15edbb9d7baf57826bbecbb0b5cc9d9c5948c3";
+		//String sha512PW = "8b8b6aa4bf808f01017bc1fb50960a18b3861f6ae269b138de8ff975c15b4ab607a2c3847301bb74d1b6ac106d15edbb9d7baf57826bbecbb0b5cc9d9c5948c3";
 		// 패스워드 해쉬값 리턴
-		//String sha512PW = invocable.invokeFunction("SHA512", rawPW).toString();
-		//System.out.println(sha512PW);
+		String sha512PW = invocable.invokeFunction("SHA512", rawPW).toString();
+		System.out.println(sha512PW);
 		
 		//String sha512PW = "8b8b6aa4bf808f01017bc1fb50960a18b3861f6ae269b138de8ff975c15b4ab607a2c3847301bb74d1b6ac106d15edbb9d7baf57826bbecbb0b5cc9d9c5948c3";
 		String loginURL = "https://eclass2.hufs.ac.kr:4443/ilos/lo/login.acl?usr_id=" + sID +
