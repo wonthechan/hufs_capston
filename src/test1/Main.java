@@ -30,31 +30,31 @@ import org.jsoup.select.Elements;
 public class Main {
 	
 	static Map<String, String> loginCookie = null;
-	// Windows, WhaleÀÇ User Agent.
+	// Windows, Whaleì˜ User Agent.
 	static String userAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.110 Whale/1.4.64.6 Safari/537.36";
 	
 	public static void main(String[] args) throws IOException, Exception {
-		// ÀÚ¹Ù½ºÅ©¸³Æ® function È£ÃâÀ» À§ÇØ Nashorn JavaScript ¿£Áø »ç¿ë
+		// ìë°”ìŠ¤í¬ë¦½íŠ¸ function í˜¸ì¶œì„ ìœ„í•´ Nashorn JavaScript ì—”ì§„ ì‚¬ìš©
 		ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
+		// ìë°”ìŠ¤í¬ë¦½íŠ¸ íŒŒì¼ ìœ„ì¹˜ 
 		engine.eval(new FileReader("./src/sha512.js"));
 		
 		// cast the script engine to an invocable instance
 		Invocable invocable = (Invocable) engine;
 		//Object result = invocable.invokeFunction("SHA512", "sdfdfsf");
 		
-		// parameter °ªÀ¸·Î form data Àü¼Û
+		// parameter ê°’ìœ¼ë¡œ form data ì „ì†¡
 		String sID = "201402783";
 		String rawPW = "";
 		//String sha512PW = "8b8b6aa4bf808f01017bc1fb50960a18b3861f6ae269b138de8ff975c15b4ab607a2c3847301bb74d1b6ac106d15edbb9d7baf57826bbecbb0b5cc9d9c5948c3";
-		// ÆĞ½º¿öµå ÇØ½¬°ª ¸®ÅÏ
+		// íŒ¨ìŠ¤ì›Œë“œ í•´ì‰¬ê°’ ë¦¬í„´
 		String sha512PW = invocable.invokeFunction("SHA512", rawPW).toString();
 		System.out.println(sha512PW);
-		
 		//String sha512PW = "8b8b6aa4bf808f01017bc1fb50960a18b3861f6ae269b138de8ff975c15b4ab607a2c3847301bb74d1b6ac106d15edbb9d7baf57826bbecbb0b5cc9d9c5948c3";
 		String loginURL = "https://eclass2.hufs.ac.kr:4443/ilos/lo/login.acl?usr_id=" + sID +
 							"&usr_pwd=" + sha512PW;
 		
-		// ·Î±×ÀÎ(POST) - HTTPS
+		// ë¡œê·¸ì¸(POST) - HTTPS
     	Connection.Response response1 = Jsoup.connect(loginURL)
 				.userAgent(userAgent)
 				.timeout(3000)
@@ -69,8 +69,8 @@ public class Main {
 				.method(Connection.Method.POST)
 				.execute();
 		//System.out.println(response1.statusMessage());
-		// ·Î±×ÀÎ ¼º°ø ÈÄ ¾òÀº ÄíÅ°.
-		// ÄíÅ° Áß TSESSIONÀÌ¶ó´Â °ªÀ» È®ÀÎÇÒ ¼ö ÀÖ´Ù.
+		// ë¡œê·¸ì¸ ì„±ê³µ í›„ ì–»ì€ ì¿ í‚¤.
+		// ì¿ í‚¤ ì¤‘ TSESSIONì´ë¼ëŠ” ê°’ì„ í™•ì¸í•  ìˆ˜ ìˆë‹¤.
 		loginCookie = response1.cookies();
 		
 		if(loginCookie.containsKey("JSESSIONID")) {
@@ -80,14 +80,14 @@ public class Main {
 			System.out.println("JSESSIONID NOT FOUND!!");
 		}
 		
-		// ÀÌÅ¬·¡½º ¸ŞÀÎ ÆäÀÌÁö GET
+		// ì´í´ë˜ìŠ¤ ë©”ì¸ í˜ì´ì§€ GET
 		Document mainPage = getPageDocument("http://eclass2.hufs.ac.kr:8181/ilos/main/main_form.acl");
 		//System.out.println(mainPage.toString());
 		
-		// ¼ö°­°ú¸ñ¸¸ ÆÄ½Ì
+		// ìˆ˜ê°•ê³¼ëª©ë§Œ íŒŒì‹±
 		Elements e1 = mainPage.select("em[class=sub_open]");
-		List<String> lectureList = new ArrayList<String>(); // ¼ö°­°ú¸ñ ÀÌ¸§ ¸®½ºÆ®
-		List<String> lectureCodeList = new ArrayList<String>(); // ¼ö°­°ú¸ñ ÄÚµå °ú URL ¸®½ºÆ®
+		List<String> lectureList = new ArrayList<String>(); // ìˆ˜ê°•ê³¼ëª© ì´ë¦„ ë¦¬ìŠ¤íŠ¸
+		List<String> lectureCodeList = new ArrayList<String>(); // ìˆ˜ê°•ê³¼ëª© ì½”ë“œ ê³¼ URL ë¦¬ìŠ¤íŠ¸
 		
 		for(Element lec : e1) {
 			String lecRawTitle = lec.attr("title");
@@ -105,19 +105,19 @@ public class Main {
 			// Refresh connection on every lecture
 			eclassRoomConnect(lectureCodeList.get(i));
 			
-	    	// °­ÀÇ½Ç °øÁö»çÇ× °Ô½ÃÆÇ ÆäÀÌÁö  GET
+	    	// ê°•ì˜ì‹¤ ê³µì§€ì‚¬í•­ ê²Œì‹œíŒ í˜ì´ì§€  GET
 			Document eclassNoticePage = getPageDocument("http://eclass2.hufs.ac.kr:8181/ilos/st/course/notice_list_form.acl");
 			
-			// °øÁö»çÇ× Á¶Áö±â
-			System.out.println("*** [" + lectureList.get(i) + "] °øÁö»çÇ× ÃÖ±Ù °Ô½Ã¹° ***");
+			// ê³µì§€ì‚¬í•­ ì¡°ì§€ê¸°
+			System.out.println("*** [" + lectureList.get(i) + "] ê³µì§€ì‚¬í•­ ìµœê·¼ ê²Œì‹œë¬¼ ***");
 			if(!eclassNoticePage.select("table[class=bbslist] tbody tr td[class=left]").isEmpty()) {
 				Elements noticeTitles = eclassNoticePage.select("table[class=bbslist] tbody tr");
-				// °¡Àå ÃÖ±Ù °øÁö»çÇ× °Ô½Ã¹°ÀÇ Á¦¸ñ°ú °Ô½Ã ÀÏÀÚ Ãâ·Â
+				// ê°€ì¥ ìµœê·¼ ê³µì§€ì‚¬í•­ ê²Œì‹œë¬¼ì˜ ì œëª©ê³¼ ê²Œì‹œ ì¼ì ì¶œë ¥
 				System.out.println("===> " + noticeTitles.get(0).select("td").get(1).text() + "\t" + 
 									noticeTitles.get(0).select("td").get(4).text());	
 			}
 			else {
-				System.out.println("===> °øÁö»çÇ×ÀÌ ¾ø½À´Ï´Ù..");
+				System.out.println("===> ê³µì§€ì‚¬í•­ì´ ì—†ìŠµë‹ˆë‹¤..");
 			}
 			System.out.println();
 		}
@@ -133,7 +133,7 @@ public class Main {
 					.header("Content-Type", "text/html; charset=utf-8")
 					.header("Accept-Encoding", "gzip, deflate")
 					.header("Accept-Language", "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7")
-					.cookies(loginCookie) // À§¿¡¼­ ¾òÀº '·Î±×ÀÎ µÈ' ÄíÅ°
+					.cookies(loginCookie) // ìœ„ì—ì„œ ì–»ì€ 'ë¡œê·¸ì¸ ëœ' ì¿ í‚¤
 					.method(Connection.Method.GET)
 					.get();
 		} catch (IOException e) {
@@ -144,28 +144,28 @@ public class Main {
 	
 	/*
 	 * E-CLASS connect GET
-	 * http://eclass2.hufs.ac.kr:8181/ilos/st/course/eclass_room2.acl  ==> POST(ÇĞ¼ö¹øÈ£ÄÚµå¸¦ ³Ñ±ä´Ù)
+	 * http://eclass2.hufs.ac.kr:8181/ilos/st/course/eclass_room2.acl  ==> POST(í•™ìˆ˜ë²ˆí˜¸ì½”ë“œë¥¼ ë„˜ê¸´ë‹¤)
 	 * http://eclass2.hufs.ac.kr:8181/ilos/st/course/submain_form.acl  ==> GET
-	 * ¸ğµç °­ÀÇ½Ç ÆäÀÌÁö´Â "/ilos/st/course/submain_form.acl" ·Î µ¿ÀÏ
-	 * ±×Àü¿¡ ÀÎÁõ°°Àº °úÁ¤ÀÌ ÀÌ·ç¾îÁ®¾ß ÇÏ´Âµ¥ ÀÌ¶§ "/ilos/st/course/eclass_room2.acl" ¸µÅ©¸¦ ÅëÇØ ÇĞ¼öÄÚµå¸¦ Æ÷ÇÔÇÑ µ¥ÀÌÅÍ¸¦ ÇÔ²² POST
-	 * ¼º°øÀûÀ¸·Î ÀÎÁõÀÌ µÇ¸é JSON ÀÀ´äÀ» ÅëÇØ È®ÀÎÇÒ ¼ö ÀÖÀ½
-	 * ±× ÈÄ ´Ù½Ã "/ilos/st/course/submain_form.acl" ¸¦ GET ÇÏ¸é ÇØ´ç °­ÀÇ½Ç ÆäÀÌÁö¸¦ ºÒ·¯ ¿Ã ¼ö ÀÖ´Ù.
+	 * ëª¨ë“  ê°•ì˜ì‹¤ í˜ì´ì§€ëŠ” "/ilos/st/course/submain_form.acl" ë¡œ ë™ì¼
+	 * ê·¸ì „ì— ì¸ì¦ê°™ì€ ê³¼ì •ì´ ì´ë£¨ì–´ì ¸ì•¼ í•˜ëŠ”ë° ì´ë•Œ "/ilos/st/course/eclass_room2.acl" ë§í¬ë¥¼ í†µí•´ í•™ìˆ˜ì½”ë“œë¥¼ í¬í•¨í•œ ë°ì´í„°ë¥¼ í•¨ê»˜ POST
+	 * ì„±ê³µì ìœ¼ë¡œ ì¸ì¦ì´ ë˜ë©´ JSON ì‘ë‹µì„ í†µí•´ í™•ì¸í•  ìˆ˜ ìˆìŒ
+	 * ê·¸ í›„ ë‹¤ì‹œ "/ilos/st/course/submain_form.acl" ë¥¼ GET í•˜ë©´ í•´ë‹¹ ê°•ì˜ì‹¤ í˜ì´ì§€ë¥¼ ë¶ˆëŸ¬ ì˜¬ ìˆ˜ ìˆë‹¤.
 	 */
 	private static void eclassRoomConnect(String lecCode) {
-		// Àü¼ÛÇÒ Æû µ¥ÀÌÅÍ
+		// ì „ì†¡í•  í¼ ë°ì´í„°
 		Map<String, String> data = new HashMap<String, String>();
 		data.put("KJKEY", lecCode);
 		data.put("returnURI", "/ilos/st/course/submain_form.acl");
 		data.put("encoding", "utf-8");
 
-    	// POST (JSON ÀÀ´ä)
+    	// POST (JSON ì‘ë‹µ)
 		// KJKEY=A20191U5510620101&returnURI=%252Filos%252Fst%252Fcourse%252Fsubmain_form.acl&encoding=utf-8
     	try {
 			String jsoupStr = Jsoup.connect("http://eclass2.hufs.ac.kr:8181/ilos/st/course/eclass_room2.acl")
 					.userAgent(userAgent)
 					.timeout(3000)
 					.ignoreContentType(true)
-					.cookies(loginCookie) // À§¿¡¼­ ¾òÀº '·Î±×ÀÎ µÈ' ÄíÅ°
+					.cookies(loginCookie) // ìœ„ì—ì„œ ì–»ì€ 'ë¡œê·¸ì¸ ëœ' ì¿ í‚¤
 					.data(data)
 					.method(Connection.Method.POST)
 					.execute().body();
