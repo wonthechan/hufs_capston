@@ -27,7 +27,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-public class Main {
+public class EclassParseTest {
 	
 	static Map<String, String> loginCookie = null;
 	// Windows, Whale¿« User Agent.
