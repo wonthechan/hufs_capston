@@ -4,5 +4,11 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="lib" path="C:/pub/Javalib/jsoup-1.11.2.jar"/>
 	<classpathentry kind="lib" path="C:/pub/Javalib/jsoup-1.11.2-javadoc.jar"/>
+	<classpathentry kind="lib" path="C:/pub/Javalib/poi-ooxml-schemas-4.1.0.jar"/>
+	<classpathentry kind="lib" path="C:/pub/Javalib/poi-ooxml-4.1.0.jar"/>
+	<classpathentry kind="lib" path="C:/pub/Javalib/poi-4.1.0.jar"/>
+	<classpathentry kind="lib" path="C:/pub/Javalib/xmlbeans-2.6.0.jar"/>
+	<classpathentry kind="lib" path="C:/pub/Javalib/dom4j-1.6.1.jar"/>
+	<classpathentry kind="lib" path="C:/pub/Javalib/commons-collections4-4.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
