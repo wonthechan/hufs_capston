@@ -10,5 +10,6 @@
 	<classpathentry kind="lib" path="C:/pub/Javalib/xmlbeans-2.6.0.jar"/>
 	<classpathentry kind="lib" path="C:/pub/Javalib/dom4j-1.6.1.jar"/>
 	<classpathentry kind="lib" path="C:/pub/Javalib/commons-collections4-4.1.jar"/>
+	<classpathentry kind="lib" path="C:/pub/Javalib/mysql-connector-java-5.1.20-bin.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
