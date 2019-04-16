@@ -64,6 +64,56 @@ public class LecParseTest {
 		majorLecList = new ArrayList<HashMap<String, String>>();
 		liberalLecList = new ArrayList<HashMap<String, String>>();
 		
+//		/* Just for single parse test */
+//		Document lecInitDoc = getPageDoc("https://wis.hufs.ac.kr/src08/jsp/lecture/LECTURE2020L.jsp?tab_lang=K&ag_ledg_year=2019&ag_ledg_sessn=1&ag_org_sect=A&campus_sect=H2");
+//		
+//		/* 1. 전공 영역 코드 파싱 (글로벌 기준) */
+//		Elements majorCodeElements = lecInitDoc.select("select[name=ag_crs_strct_cd] option");
+//		
+//		for(int i = 0; i < majorCodeElements.size(); i++) {
+//			HashMap<String, String> temp = new HashMap<String, String>();
+//			temp.put("code", majorCodeElements.get(i).attr("value"));
+//			temp.put("title", majorCodeElements.get(i).text().substring(8));
+//			//System.out.println(temp.get("code") + "\t" + temp.get("title"));
+//			majorCodeList.add(temp);
+//		}
+//		
+//		/* 2. 전공 영역 강의 object 파싱 (글로벌 기준) */
+//		// test : 모든 전공 영역 code를 대입한 강의 페이지를 GET하고 각 강의 object를 파싱하여 majorLectList에 저장 한다.
+//		System.out.print("Parsing major lectures now...");
+//		for(int i = 0; i < majorCodeList.size(); i++) {
+//			Document majorLecDoc = getMajorLecDoc(param_year, param_session, param_orgSect, param_camSect, param_MajorCode);
+//			Elements majorLecElements = majorLecDoc.select("div[id=premier1] tbody tr");
+//			for(int j = 1; j < majorLecElements.size(); j++) {
+//				// 세부 구분
+//				Elements majorLecTdElements = majorLecElements.get(1).select("td");
+//				//temp.put("raw", majorLecElements.get(j).text());
+//				/*
+//				temp.put("area", majorLecTdElements.get(1).text());
+//				temp.put("year", majorLecTdElements.get(2).text());
+//				temp.put("code", majorLecTdElements.get(3).text());
+//				temp.put("title", majorLecTdElements.get(4).text());
+//				temp.put("prof", majorLecTdElements.get(11).text());
+//				temp.put("credit", majorLecTdElements.get(12).text());
+//				temp.put("time", majorLecTdElements.get(13).text());
+//				temp.put("sched", majorLecTdElements.get(14).text());
+//				temp.put("numpeople", majorLecTdElements.get(15).text());
+//				temp.put("note", majorLecTdElements.get(16).text());
+//				*/
+//				//System.out.println(temp.get("raw")); // 출력 test
+//				majorLecList.add(temp);
+//			}
+//			System.out.print(".");
+//		}
+//		System.out.println("Done!");
+//		System.out.println("majorLecList size (모든 전공 강의 수) : " + majorLecList.size());
+		
+//		param_gubun = "2";
+//		param_LiberalCode = "334_H2";
+//		Document liberalLecDoc = getLiberalLecDoc(param_year, param_session, param_orgSect, param_camSect, param_LiberalCode);
+//		Elements majorLecElements = liberalLecDoc.select("div[id=premier1] tbody tr");
+//		System.out.println(majorLecElements.get(1).select("td").get(7).select("img").isEmpty());
+//		System.out.println(majorLecElements.get(5).select("td").get(7).select("img").isEmpty());
 		/* Start Parsing task */
 		startMajorLecParsing();
 		startLiberalLecParsing();
@@ -74,8 +124,32 @@ public class LecParseTest {
 		
 		/* Text file out 테스트 */
 //		saveMajorParseResultAsTxt();
+//		saveMajorParseResultAsTxt2();
 //		saveLiberalParseResultAsTxt();
 
+	}
+
+	private static void saveMajorParseResultAsTxt2() {
+		majorLecList.clear();
+		try {
+			FileWriter fw = new FileWriter("./src/major_titles.txt"); // 절대주소 경로 가능
+			BufferedWriter bw = new BufferedWriter(fw);
+
+			System.out.print("Saving the parsing result as a txt file...");
+			for (int i = 0; i < majorCodeList.size(); i++) {
+				
+				bw.write(majorCodeList.get(i).get("title").substring(0, majorCodeList.get(i).get("title").indexOf('(')-1));
+				bw.newLine(); // 줄바꿈
+
+				System.out.print(".");
+				bw.newLine();
+			}
+			System.out.println("Done!");
+			bw.close();
+		} catch (IOException e) {
+			System.err.println(e); // 에러가 있다면 메시지 출력
+			System.exit(1);
+		}
 	}
 
 	private static void startLiberalLecParsing() {
@@ -109,6 +183,35 @@ public class LecParseTest {
 				temp.put("year", liberalLecTdElements.get(2).text());
 				temp.put("code", liberalLecTdElements.get(3).text());
 				temp.put("title", liberalLecTdElements.get(4).text());
+				if(liberalLecTdElements.get(6).select("img").isEmpty()) {
+					temp.put("junpil", "0");
+				} else {
+					temp.put("junpil", "1"); // 전필인 경우
+				}
+				
+				if(liberalLecTdElements.get(7).select("img").isEmpty()) {
+					temp.put("cyber", "0");
+				} else {
+					temp.put("cyber", "1"); // 온라인강의인 경우
+				}
+				
+				if(liberalLecTdElements.get(8).select("img").isEmpty()) {
+					temp.put("muke", "0");
+				} else {
+					temp.put("muke", "1"); // 무크인 경우
+				}
+				
+				if(liberalLecTdElements.get(9).select("img").isEmpty()) {
+					temp.put("foreign", "0");
+				} else {
+					temp.put("foreign", "1"); // 원어인 경우
+				}
+				
+				if(liberalLecTdElements.get(10).select("img").isEmpty()) {
+					temp.put("team", "0");
+				} else {
+					temp.put("team", "1"); // 팀티칭인 경우
+				}
 				temp.put("prof", liberalLecTdElements.get(11).text());
 				temp.put("credit", liberalLecTdElements.get(12).text());
 				temp.put("time", liberalLecTdElements.get(13).text());
@@ -155,6 +258,35 @@ public class LecParseTest {
 				temp.put("year", majorLecTdElements.get(2).text());
 				temp.put("code", majorLecTdElements.get(3).text());
 				temp.put("title", majorLecTdElements.get(4).text());
+				if(majorLecTdElements.get(6).select("img").isEmpty()) {
+					temp.put("junpil", "0");
+				} else {
+					temp.put("junpil", "1"); // 전필인 경우
+				}
+				
+				if(majorLecTdElements.get(7).select("img").isEmpty()) {
+					temp.put("cyber", "0");
+				} else {
+					temp.put("cyber", "1"); // 온라인강의인 경우
+				}
+				
+				if(majorLecTdElements.get(8).select("img").isEmpty()) {
+					temp.put("muke", "0");
+				} else {
+					temp.put("muke", "1"); // 무크인 경우
+				}
+				
+				if(majorLecTdElements.get(9).select("img").isEmpty()) {
+					temp.put("foreign", "0");
+				} else {
+					temp.put("foreign", "1"); // 원어인 경우
+				}
+				
+				if(majorLecTdElements.get(10).select("img").isEmpty()) {
+					temp.put("team", "0");
+				} else {
+					temp.put("team", "1"); // 팀티칭인 경우
+				}
 				temp.put("prof", majorLecTdElements.get(11).text());
 				temp.put("credit", majorLecTdElements.get(12).text());
 				temp.put("time", majorLecTdElements.get(13).text());
@@ -231,6 +363,20 @@ public class LecParseTest {
         cell = row.createCell(11);
         cell.setCellValue("비고");
         
+        cell = row.createCell(12);
+        cell.setCellValue("전필");
+        
+        cell = row.createCell(13);
+        cell.setCellValue("온라인");
+        
+        cell = row.createCell(14);
+        cell.setCellValue("무크");
+        
+        cell = row.createCell(15);
+        cell.setCellValue("원어");
+        
+        cell = row.createCell(16);
+        cell.setCellValue("팀티칭");
         
         // 리스트의 size 만큼 row를 생성
         for(int rowIdx=0; rowIdx < tempLecList.size(); rowIdx++) {
@@ -274,6 +420,21 @@ public class LecParseTest {
             
             cell = row.createCell(11);
             cell.setCellValue(temp.get("note"));
+            
+            cell = row.createCell(12);
+            cell.setCellValue(temp.get("junpil"));
+            
+            cell = row.createCell(13);
+            cell.setCellValue(temp.get("cyber"));
+            
+            cell = row.createCell(14);
+            cell.setCellValue(temp.get("muke"));
+            
+            cell = row.createCell(15);
+            cell.setCellValue(temp.get("foreign"));
+            
+            cell = row.createCell(16);
+            cell.setCellValue(temp.get("team"));
             
         }
 		
