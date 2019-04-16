@@ -46,8 +46,14 @@ public class LecParseTest {
 	static String param_MajorCode;
 	static String param_LiberalCode;
 	
-	public static void main(String[] args) {
-
+	public LecParseTest() {
+		// 모든 전공 및 교양 영역 코드를 저장할 HashMap ArrayList 생성
+		majorCodeList = new ArrayList<HashMap<String, String>>();
+		liberalCodeList = new ArrayList<HashMap<String, String>>();
+		// 모든 전공 및 교양 강의 과목을 저장할 HashMap ArrayList 생성
+		majorLecList = new ArrayList<HashMap<String, String>>();
+		liberalLecList = new ArrayList<HashMap<String, String>>();
+		
 		/* 파타메터 변수 초기화 */
 		param_year = "2019";
 		param_session = "1";
@@ -56,71 +62,16 @@ public class LecParseTest {
 		param_gubun = "1";
 		param_MajorCode = "AQR02_H2";
 		param_LiberalCode = "303_H2";
-		
-		// 모든 전공 및 교양 영역 코드를 저장할 HashMap ArrayList 생성
-		majorCodeList = new ArrayList<HashMap<String, String>>();
-		liberalCodeList = new ArrayList<HashMap<String, String>>();
-		// 모든 전공 및 교양 강의 과목을 저장할 HashMap ArrayList 생성
-		majorLecList = new ArrayList<HashMap<String, String>>();
-		liberalLecList = new ArrayList<HashMap<String, String>>();
-		
-//		/* Just for single parse test */
-//		Document lecInitDoc = getPageDoc("https://wis.hufs.ac.kr/src08/jsp/lecture/LECTURE2020L.jsp?tab_lang=K&ag_ledg_year=2019&ag_ledg_sessn=1&ag_org_sect=A&campus_sect=H2");
-//		
-//		/* 1. 전공 영역 코드 파싱 (글로벌 기준) */
-//		Elements majorCodeElements = lecInitDoc.select("select[name=ag_crs_strct_cd] option");
-//		
-//		for(int i = 0; i < majorCodeElements.size(); i++) {
-//			HashMap<String, String> temp = new HashMap<String, String>();
-//			temp.put("code", majorCodeElements.get(i).attr("value"));
-//			temp.put("title", majorCodeElements.get(i).text().substring(8));
-//			//System.out.println(temp.get("code") + "\t" + temp.get("title"));
-//			majorCodeList.add(temp);
-//		}
-//		
-//		/* 2. 전공 영역 강의 object 파싱 (글로벌 기준) */
-//		// test : 모든 전공 영역 code를 대입한 강의 페이지를 GET하고 각 강의 object를 파싱하여 majorLectList에 저장 한다.
-//		System.out.print("Parsing major lectures now...");
-//		for(int i = 0; i < majorCodeList.size(); i++) {
-//			Document majorLecDoc = getMajorLecDoc(param_year, param_session, param_orgSect, param_camSect, param_MajorCode);
-//			Elements majorLecElements = majorLecDoc.select("div[id=premier1] tbody tr");
-//			for(int j = 1; j < majorLecElements.size(); j++) {
-//				// 세부 구분
-//				Elements majorLecTdElements = majorLecElements.get(1).select("td");
-//				//temp.put("raw", majorLecElements.get(j).text());
-//				/*
-//				temp.put("area", majorLecTdElements.get(1).text());
-//				temp.put("year", majorLecTdElements.get(2).text());
-//				temp.put("code", majorLecTdElements.get(3).text());
-//				temp.put("title", majorLecTdElements.get(4).text());
-//				temp.put("prof", majorLecTdElements.get(11).text());
-//				temp.put("credit", majorLecTdElements.get(12).text());
-//				temp.put("time", majorLecTdElements.get(13).text());
-//				temp.put("sched", majorLecTdElements.get(14).text());
-//				temp.put("numpeople", majorLecTdElements.get(15).text());
-//				temp.put("note", majorLecTdElements.get(16).text());
-//				*/
-//				//System.out.println(temp.get("raw")); // 출력 test
-//				majorLecList.add(temp);
-//			}
-//			System.out.print(".");
-//		}
-//		System.out.println("Done!");
-//		System.out.println("majorLecList size (모든 전공 강의 수) : " + majorLecList.size());
-		
-//		param_gubun = "2";
-//		param_LiberalCode = "334_H2";
-//		Document liberalLecDoc = getLiberalLecDoc(param_year, param_session, param_orgSect, param_camSect, param_LiberalCode);
-//		Elements majorLecElements = liberalLecDoc.select("div[id=premier1] tbody tr");
-//		System.out.println(majorLecElements.get(1).select("td").get(7).select("img").isEmpty());
-//		System.out.println(majorLecElements.get(5).select("td").get(7).select("img").isEmpty());
+	}
+	
+	public static void main(String[] args) {
 		/* Start Parsing task */
-		startMajorLecParsing();
-		startLiberalLecParsing();
+//		startMajorLecParsing();
+//		startLiberalLecParsing();
 		
 		/* Excel file out 테슽 */
-		saveParseResultAsXls(true);
-		saveParseResultAsXls(false);
+//		saveParseResultAsXls(true);
+//		saveParseResultAsXls(false);
 		
 		/* Text file out 테스트 */
 //		saveMajorParseResultAsTxt();
@@ -129,7 +80,18 @@ public class LecParseTest {
 
 	}
 
-	private static void saveMajorParseResultAsTxt2() {
+	private static void backupTestLines() {
+		/* Just for single parse test */
+		param_gubun = "2";
+		param_LiberalCode = "334_H2";
+		Document liberalLecDoc = getLiberalLecDoc(param_year, param_session, param_orgSect, param_camSect, param_LiberalCode);
+		Elements majorLecElements = liberalLecDoc.select("div[id=premier1] tbody tr");
+		System.out.println(majorLecElements.get(1).select("td").get(7).select("img").isEmpty());
+		System.out.println(majorLecElements.get(5).select("td").get(7).select("img").isEmpty());
+		
+	}
+
+	public void saveMajorParseResultAsTxt2() {
 		majorLecList.clear();
 		try {
 			FileWriter fw = new FileWriter("./src/major_titles.txt"); // 절대주소 경로 가능
@@ -151,8 +113,18 @@ public class LecParseTest {
 			System.exit(1);
 		}
 	}
-
-	private static void startLiberalLecParsing() {
+	
+	public List<HashMap<String, String>> getMajorLecList(){
+		startMajorLecParsing();
+		return majorLecList;
+	}
+	
+	public List<HashMap<String, String>> getLiberalLecList(){
+		startLiberalLecParsing();
+		return liberalLecList;
+	}
+	
+	private void startLiberalLecParsing() {
 		Document lecInitDoc = getPageDoc("https://wis.hufs.ac.kr/src08/jsp/lecture/LECTURE2020L.jsp?tab_lang=K&ag_ledg_year=2019&ag_ledg_sessn=1&ag_org_sect=A&campus_sect=H2");
 		
 		/* 1. 교양 영역 코드 파싱 (글로벌 기준) */	
@@ -227,7 +199,7 @@ public class LecParseTest {
 		System.out.println("liberalLecList size (모든 교양 강의 수) : " + liberalLecList.size());
 	}
 
-	private static void startMajorLecParsing() {
+	private void startMajorLecParsing() {
 		Document lecInitDoc = getPageDoc("https://wis.hufs.ac.kr/src08/jsp/lecture/LECTURE2020L.jsp?tab_lang=K&ag_ledg_year=2019&ag_ledg_sessn=1&ag_org_sect=A&campus_sect=H2");
 		
 		/* 1. 전공 영역 코드 파싱 (글로벌 기준) */
@@ -302,7 +274,7 @@ public class LecParseTest {
 		System.out.println("majorLecList size (모든 전공 강의 수) : " + majorLecList.size());
 	}
 
-	private static void saveParseResultAsXls(boolean isMajor) {
+	private void saveParseResultAsXls(boolean isMajor) {
 		String path = null;
 		String doneMessage = null;
 		List<HashMap<String, String>> tempLecList = null;
@@ -460,7 +432,7 @@ public class LecParseTest {
         }
     }
 	
-	private static void saveLiberalParseResultAsTxt() {
+	private void saveLiberalParseResultAsTxt() {
 		liberalLecList.clear();
 		try {
 			FileWriter fw = new FileWriter("./src/liberal_result.txt"); // 절대주소 경로 가능
@@ -500,7 +472,7 @@ public class LecParseTest {
 		}
 	}
 
-	private static void saveMajorParseResultAsTxt() {
+	private void saveMajorParseResultAsTxt() {
 		majorLecList.clear();
 		try {
 			FileWriter fw = new FileWriter("./src/major_result.txt"); // 절대주소 경로 가능
@@ -541,7 +513,7 @@ public class LecParseTest {
 		
 	}
 
-	private static Document getPageDoc(String url) {
+	private Document getPageDoc(String url) {
 		Document sampleDoc = null;
 		try {
 			sampleDoc = Jsoup.connect(url)

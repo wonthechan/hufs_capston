@@ -1,11 +1,21 @@
 package test1;
 
 import java.sql.*;
-
+import java.util.HashMap;
+import java.util.List;
 import java.io.*;
 // Example 5 : Typical Transaction Program
 class JDBC_Test {
+	
+	static List<HashMap<String, String>> majorLecList = null;
+	static List<HashMap<String, String>> liberalLecList = null;
+	
 	public static void main(String[] args) throws SQLException, IOException{
+		
+		LecParseTest lecParseTest = new LecParseTest();
+		//majorLecList = lecParseTest.getMajorLecList();
+		//liberalLecList = lecParseTest.getLiberalLecList();
+		
 		// Load MySQL JDBC Driver
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
@@ -22,24 +32,29 @@ class JDBC_Test {
 		user = readEntry("userid : ");
 		pass = readEntry("password: ");
 		*/
-		db="dbName";
-		user="userID";
-		pass="userPW";
-		Connection conn = DriverManager.getConnection("jdbc:mysql://db.hufs.ac.kr:3306/"+db, user, pass);
+		db="capstonDB";
+		user="s201402783";
+		pass=readEntry("password: ");
+		Connection conn = DriverManager.getConnection("jdbc:mysql://106.10.42.35:3306/"+db, user, pass);
 
 		Statement s = conn.createStatement();
-		s.executeUpdate("drop table if exists ttt");
-		s.executeUpdate("create table ttt(id int primary key) engine=InnoDB");
+//		s.executeUpdate("drop table if exists ttt");
+//		s.executeUpdate("create table ttt(id int primary key) engine=InnoDB");
 		boolean success = false;
 		conn.setAutoCommit(false);
 		// when transactio nis executed normally, set success to true
 		// if success is true, commit; otherwise rollback
 		try {
 			// transaction starts here
-			s.executeUpdate("insert into ttt values(1)");
-			s.executeUpdate("insert into ttt values(2)");
+			String insertQuery = "insert into TIMETABLE values ";
+			for(int i = 0; i < majorLecList.size(); i++) {
+				insertQuery += "(";
+			}
+			s.executeUpdate("insert into TIMETABLE values(1)");
 			//s.executeUpdate("insert into ttt values(1)");
-			s.executeUpdate("insert into ttt values(3)");
+			//s.executeUpdate("insert into ttt values(2)");
+			//s.executeUpdate("insert into ttt values(1)");
+			//s.executeUpdate("insert into ttt values(3)");
 			success = true;
 		} catch(Exception e) {
 			System.out.println("Exception occurred. Transaction will be rollbacked");
