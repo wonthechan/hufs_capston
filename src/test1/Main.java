@@ -94,14 +94,10 @@ public class Main {
 			String lecRawCode = lec.attr("onclick");
 			lectureList.add(lecRawTitle.substring(0, lecRawTitle.length() - 9));
 			lectureCodeList.add(lecRawCode.substring(lecRawCode.indexOf('\'') + 1, lecRawCode.lastIndexOf('\'')));
-			//System.out.println(lecRawCode.substring(lecRawCode.indexOf('\'') + 1, lecRawCode.lastIndexOf('\'')));
-			//System.out.println(lecRawTitle.substring(0, lecRawTitle.length() - 9));
 		}
-		//System.out.println(lectureList.size());
-		//System.out.println(lectureCodeList.size());
 		
 		for(int i = 0; i < lectureList.size(); i++) {
-
+			
 			// Refresh connection on every lecture
 			eclassRoomConnect(lectureCodeList.get(i));
 			
