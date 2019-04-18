@@ -14,7 +14,7 @@ class JDBC_Test {
 		
 		LecParseTest lecParseTest = new LecParseTest();
 		//majorLecList = lecParseTest.getMajorLecList();
-		//liberalLecList = lecParseTest.getLiberalLecList();
+		liberalLecList = lecParseTest.getLiberalLecList();
 		
 		// Load MySQL JDBC Driver
 		try {
@@ -35,8 +35,10 @@ class JDBC_Test {
 		db="capstonDB";
 		user="s201402783";
 		pass=readEntry("password: ");
+		//pass = "";
 		Connection conn = DriverManager.getConnection("jdbc:mysql://106.10.42.35:3306/"+db, user, pass);
 
+		String insertQuery = null;
 		Statement s = conn.createStatement();
 //		s.executeUpdate("drop table if exists ttt");
 //		s.executeUpdate("create table ttt(id int primary key) engine=InnoDB");
@@ -46,18 +48,69 @@ class JDBC_Test {
 		// if success is true, commit; otherwise rollback
 		try {
 			// transaction starts here
-			String insertQuery = "insert into TIMETABLE values ";
-			for(int i = 0; i < majorLecList.size(); i++) {
-				insertQuery += "(";
+			System.out.println("Updating capstonDB...");
+
+			/* 전공 강의들을 모두 DB에 Insert */
+			/*
+			int cntMajor = majorLecList.size();	
+			for(int i = 0; i < cntMajor; i++) {
+				//System.out.println(majorLecList.get(i).get("title"));
+				System.out.println(i);
+				insertQuery = "insert into TIMETABLE values (\'";
+				insertQuery += majorLecList.get(i).get("code") + "\', \'";
+				insertQuery += majorLecList.get(i).get("gubun") + "\', \'";
+				insertQuery += majorLecList.get(i).get("area") + "\', \'";
+				insertQuery += majorLecList.get(i).get("year") + "\', \'";
+				insertQuery += majorLecList.get(i).get("title") + "\', \'";
+				insertQuery += majorLecList.get(i).get("prof") + "\', \'";
+				insertQuery += majorLecList.get(i).get("credit") + "\', \'";
+				insertQuery += majorLecList.get(i).get("time") + "\', \'";
+				insertQuery += majorLecList.get(i).get("sched") + "\', \'";
+				insertQuery += majorLecList.get(i).get("numpeople").substring(0, majorLecList.get(0).get("numpeople").indexOf('/')-1) + "\', \'";
+				insertQuery += majorLecList.get(i).get("numpeople").substring(majorLecList.get(0).get("numpeople").indexOf('/')+1) + "\', \'";
+				insertQuery += majorLecList.get(i).get("junpil") + "\', \'";
+				insertQuery += majorLecList.get(i).get("cyber") + "\', \'";
+				insertQuery += majorLecList.get(i).get("muke") + "\', \'";
+				insertQuery += majorLecList.get(i).get("foreign") + "\', \'";
+				insertQuery += majorLecList.get(i).get("team") + "\', \'";
+				insertQuery += majorLecList.get(i).get("note") + "\')";
+				s.executeUpdate(insertQuery);
 			}
-			s.executeUpdate("insert into TIMETABLE values(1)");
-			//s.executeUpdate("insert into ttt values(1)");
-			//s.executeUpdate("insert into ttt values(2)");
-			//s.executeUpdate("insert into ttt values(1)");
-			//s.executeUpdate("insert into ttt values(3)");
+			System.out.println("Major Insert Task Done!");
+			*/
+			
+			/* 교양 강의들을 모두 DB에 Insert */
+			insertQuery = null;
+			int cntLiberal = liberalLecList.size();	
+			for(int i = 0; i < cntLiberal; i++) {
+				//System.out.println(majorLecList.get(i).get("title"));
+				System.out.println(i);
+				insertQuery = "insert into TIMETABLE values (\'";
+				insertQuery += liberalLecList.get(i).get("code") + "\', \'";
+				insertQuery += liberalLecList.get(i).get("gubun") + "\', \'";
+				insertQuery += liberalLecList.get(i).get("area") + "\', \'";
+				insertQuery += liberalLecList.get(i).get("year") + "\', \'";
+				insertQuery += liberalLecList.get(i).get("title") + "\', \'";
+				insertQuery += liberalLecList.get(i).get("prof") + "\', \'";
+				insertQuery += liberalLecList.get(i).get("credit") + "\', \'";
+				insertQuery += liberalLecList.get(i).get("time") + "\', \'";
+				insertQuery += liberalLecList.get(i).get("sched") + "\', \'";
+				insertQuery += liberalLecList.get(i).get("numpeople").substring(0, liberalLecList.get(0).get("numpeople").indexOf('/')-1) + "\', \'";
+				insertQuery += liberalLecList.get(i).get("numpeople").substring(liberalLecList.get(0).get("numpeople").indexOf('/')+1) + "\', \'";
+				insertQuery += liberalLecList.get(i).get("junpil") + "\', \'";
+				insertQuery += liberalLecList.get(i).get("cyber") + "\', \'";
+				insertQuery += liberalLecList.get(i).get("muke") + "\', \'";
+				insertQuery += liberalLecList.get(i).get("foreign") + "\', \'";
+				insertQuery += liberalLecList.get(i).get("team") + "\', \'";
+				insertQuery += liberalLecList.get(i).get("note") + "\')";
+				s.executeUpdate(insertQuery);
+			}
+			System.out.println("Liberal Insert Task Done!");
+			
 			success = true;
 		} catch(Exception e) {
 			System.out.println("Exception occurred. Transaction will be rollbacked");
+			System.out.println(insertQuery);
 		} finally {
 			try {
 				if(success) {
@@ -72,7 +125,7 @@ class JDBC_Test {
 			conn.close();
 		}
 	}
-	
+
 	// readEntry function -- to read input string
 	static String readEntry(String prompt) {
 		try {
