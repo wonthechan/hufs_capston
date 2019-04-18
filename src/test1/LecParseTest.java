@@ -69,7 +69,7 @@ public class LecParseTest {
 //		startMajorLecParsing();
 //		startLiberalLecParsing();
 		
-		/* Excel file out 테슽 */
+		/* Excel file out 테스트 */
 //		saveParseResultAsXls(true);
 //		saveParseResultAsXls(false);
 		
@@ -77,18 +77,19 @@ public class LecParseTest {
 //		saveMajorParseResultAsTxt();
 //		saveMajorParseResultAsTxt2();
 //		saveLiberalParseResultAsTxt();
-
+//		backupTestLines();
 	}
 
 	private static void backupTestLines() {
 		/* Just for single parse test */
-		param_gubun = "2";
-		param_LiberalCode = "334_H2";
-		Document liberalLecDoc = getLiberalLecDoc(param_year, param_session, param_orgSect, param_camSect, param_LiberalCode);
-		Elements majorLecElements = liberalLecDoc.select("div[id=premier1] tbody tr");
-		System.out.println(majorLecElements.get(1).select("td").get(7).select("img").isEmpty());
-		System.out.println(majorLecElements.get(5).select("td").get(7).select("img").isEmpty());
-		
+//		System.out.println(majorLecList.get(0).get("numpeople").substring(0, majorLecList.get(0).get("numpeople").indexOf('/')-1));
+//		System.out.println(majorLecList.get(0).get("numpeople").substring(majorLecList.get(0).get("numpeople").indexOf('/')+2));
+		Document majorLecDoc = getMajorLecDoc("2019", "1", "A", "H2", "AQR02_H2");
+		Elements majorLecElements = majorLecDoc.select("div[id=premier1] tbody tr");
+		System.out.println(majorLecElements.get(1).select("td").get(4).select("font[class=txt_navy]").toString().split("<br>")[0].substring(23));
+		System.out.println(majorLecElements.get(2).select("td").get(4).select("font[class=txt_navy]").toString().split("<br>")[0].substring(23));
+		System.out.println(majorLecElements.get(3).select("td").get(4).select("font[class=txt_navy]").toString().split("<br>")[0].substring(23));
+		System.out.println(majorLecElements.get(4).select("td").get(4).select("font[class=txt_navy]").toString().split("<br>")[0].substring(23));
 	}
 
 	public void saveMajorParseResultAsTxt2() {
@@ -129,11 +130,12 @@ public class LecParseTest {
 		
 		/* 1. 교양 영역 코드 파싱 (글로벌 기준) */	
 		Elements liberalCodeElements = lecInitDoc.select("select[name=ag_compt_fld_cd] option");
-		
+		String liberalTitle = null;
 		for(int i = 0; i < liberalCodeElements.size(); i++) {
 			HashMap<String, String> temp = new HashMap<String, String>();
 			temp.put("code", liberalCodeElements.get(i).attr("value"));
-			temp.put("title", liberalCodeElements.get(i).text());
+			liberalTitle = liberalCodeElements.get(i).text();
+			temp.put("title", liberalTitle);
 			//System.out.println(temp.get("code") + "\t" + temp.get("title"));
 			liberalCodeList.add(temp);
 		}
@@ -153,8 +155,10 @@ public class LecParseTest {
 				temp.put("gubun", liberalCodeList.get(i).get("title"));
 				temp.put("area", liberalLecTdElements.get(1).text());
 				temp.put("year", liberalLecTdElements.get(2).text());
-				temp.put("code", liberalLecTdElements.get(3).text());
-				temp.put("title", liberalLecTdElements.get(4).text());
+				temp.put("code", liberalLecTdElements.get(3).text().replace("</td>", ""));
+				// 한글만 추출
+				temp.put("title", liberalLecTdElements.get(4).select("font[class=txt_navy]").toString().split("<br>")[0].substring(23));
+				//temp.put("title", liberalLecTdElements.get(4).text());
 				if(liberalLecTdElements.get(6).select("img").isEmpty()) {
 					temp.put("junpil", "0");
 				} else {
@@ -184,7 +188,7 @@ public class LecParseTest {
 				} else {
 					temp.put("team", "1"); // 팀티칭인 경우
 				}
-				temp.put("prof", liberalLecTdElements.get(11).text());
+				temp.put("prof", liberalLecTdElements.get(11).text().replace('\'', '.'));
 				temp.put("credit", liberalLecTdElements.get(12).text());
 				temp.put("time", liberalLecTdElements.get(13).text());
 				temp.put("sched", liberalLecTdElements.get(14).text());
@@ -204,12 +208,13 @@ public class LecParseTest {
 		
 		/* 1. 전공 영역 코드 파싱 (글로벌 기준) */
 		Elements majorCodeElements = lecInitDoc.select("select[name=ag_crs_strct_cd] option");
-		
+		String majorTitle = null;
 		for(int i = 0; i < majorCodeElements.size(); i++) {
 			HashMap<String, String> temp = new HashMap<String, String>();
 			temp.put("code", majorCodeElements.get(i).attr("value"));
-			temp.put("title", majorCodeElements.get(i).text().substring(8));
-			//System.out.println(temp.get("code") + "\t" + temp.get("title"));
+			majorTitle = majorCodeElements.get(i).text();
+			// 한글만 추출
+			temp.put("title", majorTitle.substring(majorTitle.indexOf('-')+2, majorTitle.lastIndexOf('(')-1));
 			majorCodeList.add(temp);
 		}
 		
@@ -229,7 +234,9 @@ public class LecParseTest {
 				temp.put("area", majorLecTdElements.get(1).text());
 				temp.put("year", majorLecTdElements.get(2).text());
 				temp.put("code", majorLecTdElements.get(3).text());
-				temp.put("title", majorLecTdElements.get(4).text());
+				// 한글만 추출
+				temp.put("title", majorLecTdElements.get(4).select("font[class=txt_navy]").toString().split("<br>")[0].substring(23));
+				//temp.put("title", majorLecTdElements.get(4).text());
 				if(majorLecTdElements.get(6).select("img").isEmpty()) {
 					temp.put("junpil", "0");
 				} else {
@@ -259,7 +266,7 @@ public class LecParseTest {
 				} else {
 					temp.put("team", "1"); // 팀티칭인 경우
 				}
-				temp.put("prof", majorLecTdElements.get(11).text());
+				temp.put("prof", majorLecTdElements.get(11).text().replace('\'', '.'));
 				temp.put("credit", majorLecTdElements.get(12).text());
 				temp.put("time", majorLecTdElements.get(13).text());
 				temp.put("sched", majorLecTdElements.get(14).text());
@@ -513,7 +520,7 @@ public class LecParseTest {
 		
 	}
 
-	private Document getPageDoc(String url) {
+	private static Document getPageDoc(String url) {
 		Document sampleDoc = null;
 		try {
 			sampleDoc = Jsoup.connect(url)
