@@ -44,7 +44,7 @@ public class EclassParseTest {
 		
 		// parameter 값으로 form data 전송
 		String sID = "201402783";
-		String rawPW = "";
+		String rawPW = readEntry("password: ");
 		// 패스워드 해쉬값 리턴
 		String sha512PW = invocable.invokeFunction("SHA512", rawPW).toString();
 		System.out.println(sha512PW);
@@ -167,5 +167,22 @@ public class EclassParseTest {
 			e.printStackTrace();
 		}
     	//System.out.println(jsoupStr);
+	}
+	
+	// readEntry function -- to read input string
+	static String readEntry(String prompt) {
+		try {
+			StringBuffer buffer = new StringBuffer();
+			System.out.print(prompt);
+			System.out.flush();
+			int c = System.in.read();
+			while (c != '\n' && c != -1) {
+				buffer.append((char) c);
+				c = System.in.read();
+			}
+			return buffer.toString().trim();
+		} catch (IOException e) {
+			return "";
+		}
 	}
 }
