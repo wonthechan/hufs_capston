@@ -40,8 +40,6 @@ class JDBC_Test {
 
 		String insertQuery = null;
 		Statement s = conn.createStatement();
-//		s.executeUpdate("drop table if exists ttt");
-//		s.executeUpdate("create table ttt(id int primary key) engine=InnoDB");
 		boolean success = false;
 		conn.setAutoCommit(false);
 		// when transactio nis executed normally, set success to true
