@@ -8,6 +8,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -19,8 +20,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
@@ -41,6 +44,43 @@ public class WISParseTest {
 	static Map<String, String> loginCookie = null;
 	// Windows, Whale의 User Agent.
 	static String userAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.110 Whale/1.4.64.6 Safari/537.36";
+	
+//	static {
+//	    TrustManager[] trustAllCertificates = new TrustManager[] {
+//	        new X509TrustManager() {
+//	            @Override
+//	            public X509Certificate[] getAcceptedIssuers() {
+//	                return null; // Not relevant.
+//	            }
+//	            @Override
+//	            public void checkClientTrusted(X509Certificate[] certs, String authType) {
+//	                // Do nothing. Just allow them all.
+//	            }
+//	            @Override
+//	            public void checkServerTrusted(X509Certificate[] certs, String authType) {
+//	                // Do nothing. Just allow them all.
+//	            }
+//	        }
+//	    };
+//
+//	    HostnameVerifier trustAllHostnames = new HostnameVerifier() {
+//	        @Override
+//	        public boolean verify(String hostname, SSLSession session) {
+//	            return true; // Just allow them all.
+//	        }
+//	    };
+//
+//	    try {
+//	        System.setProperty("jsse.enableSNIExtension", "false");
+//	        SSLContext sc = SSLContext.getInstance("SSL");
+//	        sc.init(null, trustAllCertificates, new SecureRandom());
+//	        HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+//	        HttpsURLConnection.setDefaultHostnameVerifier(trustAllHostnames);
+//	    }
+//	    catch (GeneralSecurityException e) {
+//	        throw new ExceptionInInitializerError(e);
+//	    }
+//	}
 	
 	public static void main(String[] args) throws IOException, Exception {
 		// 자바스크립트 function 호출을 위해 Nashorn JavaScript 엔진 사용
@@ -87,10 +127,11 @@ public class WISParseTest {
 		else {
 			System.out.println("JSESSIONID NOT FOUND!!");
 		}
-		//SSLHtmlParser();
+		SSLHtmlParser();
+		//System.setProperty("javax.net.ssl.trustStore", "c:/pub/wis_jks.jks");
 		// 종정시 취득성적 페이지 GET (SSL 연결)
-		Document mainPage = getPageDocument2("https://webs.hufs.ac.kr/src08/jsp/grade/GRADE1030L_List.jsp?tab_lang=K");
-		System.out.println(mainPage.toString());
+		//Document mainPage = getPageDocument2("https://webs.hufs.ac.kr/src08/jsp/grade/GRADE1030L_List.jsp?tab_lang=K");
+		//System.out.println(mainPage.toString());
 //		
 //		// 수강과목만 파싱
 //		Elements e1 = mainPage.select("em[class=sub_open]");
@@ -171,6 +212,7 @@ public class WISParseTest {
 	
 	private static void SSLHtmlParser() {
 		
+		
 		try {
 			URL url = new URL("https://webs.hufs.ac.kr/src08/jsp/grade/GRADE1030L_List.jsp?tab_lang=K");
 	        
@@ -182,7 +224,8 @@ public class WISParseTest {
 	        conn.setRequestProperty("Accept-Language", "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7");
 	        String tCookie = "JSESSIONID=" + loginCookie.get("JSESSIONID");
 	        System.out.println(tCookie);
-	        conn.setRequestProperty("Cookie", tCookie);
+	        //conn.setRequestProperty("Cookie", tCookie);
+	        conn.addRequestProperty("Cookie", tCookie);
 	        
 	     // SSL setting
 			SSLContext context = SSLContext.getInstance("TLS");
@@ -202,11 +245,13 @@ public class WISParseTest {
 
 						// Get trust store
 						KeyStore trustStore = KeyStore.getInstance("JKS");
-						String cacertPath = System.getProperty("java.home") + "/lib/security/cacerts"; // Trust store path
+						String cacertPath = "c:/pub/wis_jks.jks";
+						//String cacertPath = System.getProperty("java.home") + "/lib/security/cacertss"; // Trust store path
 																										// should be
 																										// different by
 																										// system platform.
-						trustStore.load(new FileInputStream(cacertPath), "changeit".toCharArray()); // Use default
+						//System.out.println(cacertPath);
+						trustStore.load(new FileInputStream(cacertPath), "123456".toCharArray()); // Use default
 																									// certification
 																									// validation
 
@@ -251,38 +296,6 @@ public class WISParseTest {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-	}
-	/*
-	 * E-CLASS connect GET
-	 * http://eclass2.hufs.ac.kr:8181/ilos/st/course/eclass_room2.acl  ==> POST(학수번호코드를 넘긴다)
-	 * http://eclass2.hufs.ac.kr:8181/ilos/st/course/submain_form.acl  ==> GET
-	 * 모든 강의실 페이지는 "/ilos/st/course/submain_form.acl" 로 동일
-	 * 그전에 인증같은 과정이 이루어져야 하는데 이때 "/ilos/st/course/eclass_room2.acl" 링크를 통해 학수코드를 포함한 데이터를 함께 POST
-	 * 성공적으로 인증이 되면 JSON 응답을 통해 확인할 수 있음
-	 * 그 후 다시 "/ilos/st/course/submain_form.acl" 를 GET 하면 해당 강의실 페이지를 불러 올 수 있다.
-	 */
-	private static void eclassRoomConnect(String lecCode) {
-		// 전송할 폼 데이터
-		Map<String, String> data = new HashMap<String, String>();
-		data.put("KJKEY", lecCode);
-		data.put("returnURI", "/ilos/st/course/submain_form.acl");
-		data.put("encoding", "utf-8");
-
-    	// POST (JSON 응답)
-		// KJKEY=A20191U5510620101&returnURI=%252Filos%252Fst%252Fcourse%252Fsubmain_form.acl&encoding=utf-8
-    	try {
-			String jsoupStr = Jsoup.connect("http://eclass2.hufs.ac.kr:8181/ilos/st/course/eclass_room2.acl")
-					.userAgent(userAgent)
-					.timeout(3000)
-					.ignoreContentType(true)
-					.cookies(loginCookie) // 위에서 얻은 '로그인 된' 쿠키
-					.data(data)
-					.method(Connection.Method.POST)
-					.execute().body();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-    	//System.out.println(jsoupStr);
 	}
 	
 	// readEntry function -- to read input string
